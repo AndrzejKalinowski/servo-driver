@@ -1,10 +1,11 @@
 #include <Arduino.h> /// Arduino main lib
 #include <PID_v1.h>  /// PID liblary
-unsigned long time = 0;
-unsigned long oldTime = 0;
+
+unsigned long time = 0;     // time variable for filter
+unsigned long oldTime = 0;  // time variable for filter
 int value;
 int oldValue;
-int out;
+int out;   /// filter output
 
 /* PID definition */
 double Setpoint, Input, Output; 
@@ -13,7 +14,6 @@ PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 /* PID definition end */
 
 //// function for driving motor
-int vel;
 void motor(int velocity){
   if (velocity >= 0)
   {
@@ -29,12 +29,12 @@ void motor(int velocity){
 }
 
 void setup() {
-  TCCR1B = TCCR1B & B11111000 | B00000001;
-  //Setpoint = 300;
-  myPID.SetMode(AUTOMATIC);
-  myPID.SetOutputLimits(-254, 254);
+  TCCR1B = TCCR1B & B11111000 | B00000001;  /// setting PWM freq. to max
 
-  Serial.begin(115200);
+  myPID.SetMode(AUTOMATIC);
+  myPID.SetOutputLimits(-255, 255);
+
+  Serial.begin(115200);      ///Serial port 
 
   value = analogRead(A0);
   oldValue = value;
@@ -42,7 +42,7 @@ void setup() {
   //motor definition
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
+  pinMode(10, OUTPUT);  //PWM
 }
 
 void loop() {
@@ -56,9 +56,7 @@ void loop() {
   Serial.print(out);
   Serial.print(", ");
   Serial.print(value);
-  //Serial.print(out);
   Serial.print(", ");
-  //motor(Output);
   Serial.print(Output);
   Serial.print(", ");
   Serial.println(Setpoint);
@@ -77,5 +75,4 @@ void loop() {
     }
   }
   //filter end
-
 }
