@@ -7,6 +7,9 @@ int value;
 int oldValue;
 int out;   /// filter output
 
+#define AIA 10  // driver input A
+#define AIB 11  // driver input B
+
 /* PID definition */
 double Setpoint, Input, Output; 
 double Kp=0.7, Ki=5, Kd=0.05; 
@@ -17,15 +20,14 @@ PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 void motor(int velocity){
   if (velocity >= 0)
   {
-    digitalWrite(8, HIGH);
-    digitalWrite(9, LOW);
+    digitalWrite(AIA, LOW);
+    analogWrite(AIB, abs(velocity));
   }
   if(velocity < 0)
   {
-    digitalWrite(8, LOW);
-    digitalWrite(9, HIGH);
+    analogWrite(AIA, abs(velocity));
+    digitalWrite(AIB, LOW);
   }
-  analogWrite(10, abs(velocity));
 }
 
 void setup() {
@@ -40,9 +42,8 @@ void setup() {
   oldValue = value;
 
   //motor definition
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);  //PWM
+  pinMode(AIA, OUTPUT);
+  pinMode(AIB, OUTPUT);
 }
 
 void loop() {
