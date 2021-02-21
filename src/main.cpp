@@ -47,7 +47,12 @@ void setup() {
 }
 
 void loop() {
-  Setpoint = analogRead(A1);
+    if (Serial.available() > 0) {
+    // read the incoming byte:
+    Setpoint = Serial.read();
+  }
+
+  //Setpoint = analogRead(A1);
   Input = out;
   myPID.Compute();
   motor(Output);
