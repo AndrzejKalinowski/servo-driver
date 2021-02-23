@@ -1,5 +1,4 @@
 #include <Arduino.h> /// Arduino main lib
-#include <PID_v1.h>  /// PID liblary
 
 unsigned long time = 0;     // time variable for filter
 unsigned long oldTime = 0;  // time variable for filter
@@ -10,11 +9,7 @@ int out;   /// filter output
 #define AIA 10  // driver input A
 #define AIB 11  // driver input B
 
-/* PID definition */
-double Setpoint = 300, Input, Output; 
-double Kp=0.7, Ki=5, Kd=0.05; 
-PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
-/* PID definition end */
+double Setpoint = 300;
 
 //// function for driving motor
 void motor(int velocity){
@@ -33,9 +28,6 @@ void motor(int velocity){
 void setup() {
   TCCR1B = TCCR1B & B11111000 | B00000001;  /// setting PWM freq. to max
 
-  myPID.SetMode(AUTOMATIC);
-  myPID.SetOutputLimits(-255, 255);
-
   Serial.begin(115200);      ///Serial port 
 
   value = analogRead(A0);
@@ -53,17 +45,18 @@ void loop() {
   }
 
   //Setpoint = analogRead(A1);
-  Input = out;
-  myPID.Compute();
-  motor(Output);
-  
   value = analogRead(A0);
+
+  if(Setpoint > out) {
+    motor(200);
+  }
+  else {
+    motor(-200);
+  }
   
   Serial.print(out);
   Serial.print(", ");
   Serial.print(value);
-  Serial.print(", ");
-  Serial.print(Output);
   Serial.print(", ");
   Serial.println(Setpoint);
   //filter
