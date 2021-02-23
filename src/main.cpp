@@ -12,7 +12,7 @@ int out;   /// filter output
 
 /* PID definition */
 double Setpoint = 300, Input, Output; 
-double Kp=0.7, Ki=5, Kd=0.05; 
+double Kp=1, Ki=5, Kd=0.2; 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 /* PID definition end */
 
