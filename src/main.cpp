@@ -11,7 +11,7 @@ int out;   /// filter output
 #define AIB 11  // driver input B
 
 /* PID definition */
-double Setpoint, Input, Output; 
+double Setpoint = 300, Input, Output; 
 double Kp=0.7, Ki=5, Kd=0.05; 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 /* PID definition end */
@@ -49,7 +49,7 @@ void setup() {
 void loop() {
     if (Serial.available() > 0) {
     // read the incoming byte:
-    Setpoint = Serial.read();
+    Setpoint = Serial.parseInt();
   }
 
   //Setpoint = analogRead(A1);
