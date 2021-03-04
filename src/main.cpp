@@ -10,9 +10,14 @@ int out;   /// filter output
 #define AIA 10  // driver input A
 #define AIB 11  // driver input B
 
+#define CHA 2
+#define CHB 3
+volatile int master_count = 0; // universal count
+volatile byte INTFLAG1 = 0; // interrupt status flag
+
 /* PID definition */
 double Setpoint = 300, Input, Output; 
-double Kp=1, Ki=5, Kd=0.2; 
+double Kp=1, Ki=4, Kd=0.2; 
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 /* PID definition end */
 
@@ -30,6 +35,18 @@ void motor(int velocity){
   }
 }
 
+void flag() {
+  INTFLAG1 = 1;
+  // add 1 to count for CW
+  if (digitalRead(CHA) && !digitalRead(CHB)) {
+    master_count++ ;
+  }
+  // subtract 1 from count for CCW
+  if (digitalRead(CHA) && digitalRead(CHB)) {
+    master_count-- ;
+  }
+}
+
 void setup() {
   TCCR1B = TCCR1B & B11111000 | B00000001;  /// setting PWM freq. to max
 
@@ -44,6 +61,13 @@ void setup() {
   //motor definition
   pinMode(AIA, OUTPUT);
   pinMode(AIB, OUTPUT);
+  
+  pinMode(CHA, INPUT);
+  pinMode(CHB, INPUT);
+  Serial.begin(9600);
+  Serial.println(master_count);
+  attachInterrupt(0, flag, RISING);
+
 }
 
 void loop() {
@@ -58,7 +82,7 @@ void loop() {
   motor(Output);
   
   value = analogRead(A0);
-  
+  /*
   Serial.print(out);
   Serial.print(", ");
   Serial.print(value);
@@ -66,6 +90,8 @@ void loop() {
   Serial.print(Output);
   Serial.print(", ");
   Serial.println(Setpoint);
+  */
+  Serial.println(master_count);
   //filter
   time = millis();
   if ((time - oldTime) >= 1)
