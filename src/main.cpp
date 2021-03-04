@@ -11,9 +11,9 @@ int out;   /// filter output
 #define AIB 11  // driver input B
 
 /* PID definition */
-double Setpoint = 300, Input, Output; 
+double Setpoint = 300, PIDInput, PIDOutput; 
 double Kp=1, Ki=5, Kd=0.2; 
-PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
+PID myPID(&PIDInput, &PIDOutput, &Setpoint, Kp, Ki, Kd, DIRECT);
 /* PID definition end */
 
 //// function for driving motor
@@ -53,9 +53,8 @@ void loop() {
   }
 
   //Setpoint = analogRead(A1);
-  Input = out;
   myPID.Compute();
-  motor(Output);
+  motor(PIDOutput);
   
   value = analogRead(A0);
   
@@ -63,7 +62,7 @@ void loop() {
   Serial.print(", ");
   Serial.print(value);
   Serial.print(", ");
-  Serial.print(Output);
+  Serial.print(PIDOutput);
   Serial.print(", ");
   Serial.println(Setpoint);
   //filter
@@ -72,12 +71,12 @@ void loop() {
   {
     if ((value - oldValue) >= 3 || (oldValue - value) >= 3)
     {
-      out = value;
+      PIDInput = value;
       oldValue = value;
     }
     else
     {
-      out = oldValue;
+      PIDInput = oldValue;
     }
   }
   //filter end
